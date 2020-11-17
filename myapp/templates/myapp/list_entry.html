@@ -1,0 +1,14 @@
+{% extends 'myapp/base.html' %}
+{% block body_block %}
+
+<h2>Analyst Name:{{ analyst.first_name }} {{ analyst.last_name }}</h2>
+    <h3>Below are the previous entries:</h3>
+    <ol>
+        <h4>Method Number | Date | Reference | Standard RSD | Standard SD | Std Correlation | Tailing | Resolution </h4>
+        {% for ent in analyst_details %}
+            <h4>{{ ent.method.Method_Number }} | {{ ent.date }} | {{ ent.reference }}  | {{ ent.standard_RSD }} | {{ ent.standardStdDev }}  |  {{ ent.CorrelationOfStandards }}  |  {{ ent.peakTailing }}  | {{ ent.resolution }}</h4>
+                <p></p>
+        {% endfor %}
+    </ol>
+<a href="{% url 'myapp:my_analysis' %}">Register another entry</a></li>
+{% endblock %}
