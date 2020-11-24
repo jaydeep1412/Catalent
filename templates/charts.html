@@ -74,7 +74,7 @@ $.ajax({
     function setChart2(){
     var ctx = document.getElementById('myChart2').getContext('2d');
         var myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: Date,
                 datasets: [{
@@ -113,7 +113,7 @@ $.ajax({
     function setChart3(){
     var ctx = document.getElementById('myChart3').getContext('2d');
         var myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: Date,
                 datasets: [{
@@ -152,7 +152,7 @@ $.ajax({
     function setChart4(){
     var ctx = document.getElementById('myChart4').getContext('2d');
         var myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: Date,
                 datasets: [{
@@ -191,7 +191,7 @@ $.ajax({
     function setChart5(){
     var ctx = document.getElementById('myChart5').getContext('2d');
         var myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: Date,
                 datasets: [{
@@ -233,6 +233,12 @@ $.ajax({
 </script>
 
 {% block content %}
+    {% if request.session.Method and request.session.DatePresent%}
+        <h3>Method:{{ request.session.Method }}</h3>
+        <h3>Method:{{ request.session.Date }}</h3>
+    {% else %}
+        <h3>Method:{{ request.session.Method }}</h3>
+    {% endif %}
 
 <div class='row'>
     <div class='col-sm-6' url-endpoint='{% url "api-data" %}'>

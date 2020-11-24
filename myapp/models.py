@@ -36,6 +36,7 @@ class Analysis(models.Model):
 
     class Meta:
         verbose_name_plural = "Analysis"
+        ordering = ["date",]
 
     def __str__(self):
         return "%s %s" %(self.analyst.get_full_name(),self.method.Method_ID)

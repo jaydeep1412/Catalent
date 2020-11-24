@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.base import View
 
-from .forms import AnalysisForm, RegisterForm
+from .forms import AnalysisForm, RegisterForm, ChartForm
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -156,13 +156,44 @@ def get_data(request, *args, **kwargs):
     }
     return JsonResponse(data) # http response
 
-def display( request, *args, **kwargs):
+'''def display( request, *args, **kwargs):
     if request.user.is_authenticated:
         return render(request, 'charts.html')
     else:
+        return render(request,'myapp/order_response.html',{'msg':"You need to login to see the visualization"})'''
+
+def display( request, *args, **kwargs):
+    if request.user.is_authenticated:
+        if (request.method == 'POST'):
+
+            form = ChartForm(request.POST,user=request.user.username)
+            #print(form)
+            if form.is_valid():
+                request.session['Method'] = form.cleaned_data['Method']
+                #print("Method :",form.cleaned_data['Method'])
+                #print("Date :", form.cleaned_data['Date'])
+
+                if form.cleaned_data['Date'] != []:
+                    request.session['DatePresent'] = 1
+                    request.session['Date'] = form.cleaned_data['Date']
+
+                else:
+                    request.session['Date'] = None
+                return render(request, 'charts.html')
+            else:
+                msg = 'Please input correct data and try again'
+                return render(request, 'myapp/order_response.html', {'msg': msg})
+
+        else:
+            form = ChartForm(user=request.user.username)
+            #methodlist = Analysis.objects.filter(analyst__username__iexact = request.user.username).values_list('method__Method_Number', flat=True)
+
+        return render(request, 'myapp/charts.html', {'form': form})
+    else:
         return render(request,'myapp/order_response.html',{'msg':"You need to login to see the visualization"})
 
-User = get_user_model()
+
+#User = get_user_model()
 
 class ChartData( APIView):
     """
@@ -178,13 +209,39 @@ class ChartData( APIView):
         """
         Return a list of all users.
         """
+        print("Inside rest API")
         print(request.session['username'])
+        print(request.session['Method'])
+        print(request.session['Date'] is None)
+
+
+        if request.session['Date'] is None:
+            Date = Analysis.objects.filter(analyst__username__iexact=request.session['username'],method__Method_Number__in=request.session['Method']).values_list('date', flat=True)
+            peakTailing = Analysis.objects.filter(analyst__username__iexact=request.session['username'],method__Method_Number__in=request.session['Method']).values_list('peakTailing', flat=True)
+            standard_RSD = Analysis.objects.filter(analyst__username__iexact=request.session['username'], method__Method_Number__in=request.session['Method']).values_list('standard_RSD', flat=True)
+            standardStdDev = Analysis.objects.filter(analyst__username__iexact=request.session['username'], method__Method_Number__in=request.session['Method']).values_list('standardStdDev', flat=True)
+            CorrelationOfStandards = Analysis.objects.filter(analyst__username__iexact=request.session['username'], method__Method_Number__in=request.session['Method']).values_list('CorrelationOfStandards', flat=True)
+            resolution = Analysis.objects.filter(analyst__username__iexact=request.session['username'], method__Method_Number__in=request.session['Method']).values_list('resolution', flat=True)
+        else:
+            Date = Analysis.objects.filter(analyst__username__iexact = request.session['username'],date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('date', flat=True)
+            peakTailing = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('peakTailing', flat=True)
+            standard_RSD = Analysis.objects.filter(analyst__username__iexact=request.session['username'],date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('standard_RSD', flat=True)
+            standardStdDev = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('standardStdDev', flat=True)
+            CorrelationOfStandards = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('CorrelationOfStandards', flat=True)
+            resolution = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('resolution', flat=True)
+        print("Date",Date)
+        print("peakTailing",peakTailing)
+        print("standard_RSD",standard_RSD)
+        print("standardStdDev", standardStdDev)
+        print("CorrelationOfStandards",CorrelationOfStandards)
+        print("resolution",resolution)
+
         data = {
-            "Date":Analysis.objects.filter(analyst__username__iexact = request.session['username']).values_list('date', flat=True),
-            "peakTailing":Analysis.objects.filter(analyst__username__iexact = request.session['username']).values_list('peakTailing', flat=True),
-            "standard_RSD": Analysis.objects.filter(analyst__username__iexact=request.session['username']).values_list('standard_RSD', flat=True),
-            "standardStdDev": Analysis.objects.filter(analyst__username__iexact=request.session['username']).values_list('standardStdDev', flat=True),
-            "CorrelationOfStandards": Analysis.objects.filter(analyst__username__iexact=request.session['username']).values_list('CorrelationOfStandards', flat=True),
-            "resolution": Analysis.objects.filter(analyst__username__iexact=request.session['username']).values_list('resolution', flat=True)
+            "Date":Date,
+            "peakTailing":peakTailing,
+            "standard_RSD":standard_RSD ,
+            "standardStdDev": standardStdDev,
+            "CorrelationOfStandards":CorrelationOfStandards ,
+            "resolution":resolution
         }
         return Response(data)
