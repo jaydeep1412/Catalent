@@ -28,7 +28,7 @@ class AnalysisForm(forms.ModelForm):
 
 class ChartForm(forms.Form):
     #queryset=Analysis.objects.filter(analyst__username__iexact=username).values('method__Method_Number'),
-    Method = forms.MultipleChoiceField(required=True)
+    '''Method = forms.MultipleChoiceField(required=True)
     Date = forms.MultipleChoiceField(required=False)
 
     def __init__(self, *args, request=None, **kwargs):
@@ -43,8 +43,22 @@ class ChartForm(forms.Form):
         #print(Analysis.objects.filter(analyst__username__iexact=user).values('method__Method_Number'))
         self.fields['Method'].choices = methodlist
         self.fields['Date'].choices = datelist
-
+'''
     #print(Analysis.objects.filter(analyst__username__iexact = username).values_list('method__Method_Number'))
+
+    Method = forms.CharField(required=True)
+    StartDate = forms.CharField(
+        required=False,
+        widget=forms.SelectDateWidget(years=range(1990,2030)),
+    )
+    EndDate = forms.CharField(
+        required=False,
+        widget=forms.SelectDateWidget(years=range(1990,2030)),
+    )
+
+
+
+
 
 
 

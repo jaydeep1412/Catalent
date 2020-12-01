@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 
 # Create your views here.
-from .models import Analyst, Analysis
+from .models import Analyst, Analysis, Method
 
 
 def register(request):
@@ -166,28 +166,48 @@ def display( request, *args, **kwargs):
     if request.user.is_authenticated:
         if (request.method == 'POST'):
 
-            form = ChartForm(request.POST,user=request.user.username)
+            form = ChartForm(request.POST)
             #print(form)
             if form.is_valid():
-                request.session['Method'] = form.cleaned_data['Method']
+                temp = form.cleaned_data['Method']
+                tempdatestart = form.cleaned_data['StartDate']
+                tempdateend = form.cleaned_data['EndDate']
+                print("Date:",tempdateend)
+                print(tempdateend=="")
+                counttemp = Method.objects.filter(Method_Number=temp).count()
+                print(counttemp)
+
+                if counttemp >= 0:
+                    request.session['Method'] = form.cleaned_data['Method']
+                else:
+                    msg = "Enter the proper Method Number"
+                    render(request, 'myapp/order_response.html', {'msg': "Enter the proper Method Number and try again"})
+
+                request.session['DatePresent'] = None
+                if tempdatestart != "" and tempdateend != "":
+                    if tempdatestart<=tempdateend:
+                        request.session['StartDate'] = tempdatestart
+                        request.session['EndDate'] = tempdateend
+                        request.session['DatePresent'] = 1
+                print("Date PResent",request.session['DatePresent'])
+
                 #print("Method :",form.cleaned_data['Method'])
                 #print("Date :", form.cleaned_data['Date'])
-
-                if form.cleaned_data['Date'] != []:
+                '''if form.cleaned_data['Date'] != []:
                     request.session['DatePresent'] = 1
                     request.session['Date'] = form.cleaned_data['Date']
 
                 else:
-                    request.session['Date'] = None
+                    request.session['Date'] = None'''
                 return render(request, 'charts.html')
             else:
                 msg = 'Please input correct data and try again'
                 return render(request, 'myapp/order_response.html', {'msg': msg})
 
         else:
-            form = ChartForm(user=request.user.username)
+            form = ChartForm()
+            #form = ChartForm(user=request.user.username)
             #methodlist = Analysis.objects.filter(analyst__username__iexact = request.user.username).values_list('method__Method_Number', flat=True)
-
         return render(request, 'myapp/charts.html', {'form': form})
     else:
         return render(request,'myapp/order_response.html',{'msg':"You need to login to see the visualization"})
@@ -212,10 +232,10 @@ class ChartData( APIView):
         print("Inside rest API")
         print(request.session['username'])
         print(request.session['Method'])
-        print(request.session['Date'] is None)
+        print(request.session['DatePresent'] is None)
 
-
-        if request.session['Date'] is None:
+        #When we had to consider the analyst specific values
+        '''if request.session['DatePresent'] is None:
             Date = Analysis.objects.filter(analyst__username__iexact=request.session['username'],method__Method_Number__in=request.session['Method']).values_list('date', flat=True)
             peakTailing = Analysis.objects.filter(analyst__username__iexact=request.session['username'],method__Method_Number__in=request.session['Method']).values_list('peakTailing', flat=True)
             standard_RSD = Analysis.objects.filter(analyst__username__iexact=request.session['username'], method__Method_Number__in=request.session['Method']).values_list('standard_RSD', flat=True)
@@ -229,12 +249,21 @@ class ChartData( APIView):
             standardStdDev = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('standardStdDev', flat=True)
             CorrelationOfStandards = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('CorrelationOfStandards', flat=True)
             resolution = Analysis.objects.filter(analyst__username__iexact=request.session['username'], date__in=request.session['Date'],method__Method_Number__in=request.session['Method']).values_list('resolution', flat=True)
-        print("Date",Date)
-        print("peakTailing",peakTailing)
-        print("standard_RSD",standard_RSD)
-        print("standardStdDev", standardStdDev)
-        print("CorrelationOfStandards",CorrelationOfStandards)
-        print("resolution",resolution)
+        '''
+        if request.session['DatePresent'] is None:
+            Date = Analysis.objects.filter(method__Method_Number=request.session['Method']).values_list('date',flat=True)
+            peakTailing = Analysis.objects.filter(method__Method_Number=request.session['Method']).values_list('peakTailing', flat=True)
+            standard_RSD = Analysis.objects.filter(method__Method_Number=request.session['Method']).values_list('standard_RSD', flat=True)
+            standardStdDev = Analysis.objects.filter(method__Method_Number=request.session['Method']).values_list('standardStdDev', flat=True)
+            CorrelationOfStandards = Analysis.objects.filter(method__Method_Number=request.session['Method']).values_list('CorrelationOfStandards',flat=True)
+            resolution = Analysis.objects.filter(method__Method_Number=request.session['Method']).values_list('resolution', flat=True)
+        else:
+            Date = Analysis.objects.filter(date__range=(request.session['StartDate'],request.session['EndDate']),method__Method_Number=request.session['Method']).values_list('date',flat=True)
+            peakTailing = Analysis.objects.filter(date__range=(request.session['StartDate'],request.session['EndDate']),method__Method_Number=request.session['Method']).values_list('peakTailing', flat=True)
+            standard_RSD = Analysis.objects.filter(date__range=(request.session['StartDate'],request.session['EndDate']),method__Method_Number=request.session['Method']).values_list('standard_RSD', flat=True)
+            standardStdDev = Analysis.objects.filter(date__range=(request.session['StartDate'],request.session['EndDate']),method__Method_Number=request.session['Method']).values_list('standardStdDev', flat=True)
+            CorrelationOfStandards = Analysis.objects.filter(date__range=(request.session['StartDate'],request.session['EndDate']),method__Method_Number=request.session['Method']).values_list('CorrelationOfStandards',flat=True)
+            resolution = Analysis.objects.filter(date__range=(request.session['StartDate'],request.session['EndDate']),method__Method_Number=request.session['Method']).values_list('resolution', flat=True)
 
         data = {
             "Date":Date,
