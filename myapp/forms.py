@@ -56,9 +56,17 @@ class ChartForm(forms.Form):
         widget=forms.SelectDateWidget(years=range(1990,2030)),
     )
 
+    Alert_Lower_Peak = forms.FloatField(required=False, label = "Lower Limit for Peak Tailing")
+    Alert_Peak = forms.FloatField(required=False, label="Higher Limit for Peak Tailing")
 
+    Alert_Lower_standard_RSD = forms.FloatField(required=False, label = "Lower Limit for Standard RSD")
+    Alert_standard_RSD = forms.FloatField(required=False, label="Higher Limit for Standard RSD")
 
+    Alert_Lower_standardStdDev = forms.FloatField(required=False, label = "Lower Limit for Standard Deviation")
+    Alert_standardStdDev = forms.FloatField(required=False, label="Higher Limit for Standard Deviation")
 
+    Alert_Lower_CorrelationOfStandards = forms.FloatField(required=False, label = "Lower Limit for Correlation of Standards")
+    Alert_CorrelationOfStandards = forms.FloatField(required=False, label="Higher Limit for Correlation of Standards")
 
-
-
+    Alert_Lower_resolution = forms.FloatField(required=False, label = "Lower Limit for Resolution")
+    Alert_resolution = forms.FloatField(required=False, label = "Higher Limit for Resolution")
