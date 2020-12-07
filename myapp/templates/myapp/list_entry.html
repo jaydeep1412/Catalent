@@ -3,12 +3,34 @@
 
 <h2>Analyst Name:{{ analyst.first_name }} {{ analyst.last_name }}</h2>
     <h3>Below are the previous entries:</h3>
-    <ol>
-        <h4>Method Number | Date | Reference | Standard RSD | Standard SD | Std Correlation | Tailing | Resolution </h4>
+        <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Method Number</th>
+            <th>Date</th>
+            <th>Reference</th>
+            <th>Standard RSD</th>
+            <th>Standard SD</th>
+            <th>Std Correlation</th>
+            <th>Tailing</th>
+            <th>Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
         {% for ent in analyst_details %}
-            <h4>{{ ent.method.Method_Number }} | {{ ent.date }} | {{ ent.reference }}  | {{ ent.standard_RSD }} | {{ ent.standardStdDev }}  |  {{ ent.CorrelationOfStandards }}  |  {{ ent.peakTailing }}  | {{ ent.resolution }}</h4>
-                <p></p>
+            <tr>
+                <td>{{ ent.method.Method_Number }}</td>
+                <td>{{ ent.date }}</td>
+                <td>{{ ent.reference }}</td>
+                <td>{{ ent.standard_RSD }}</td>
+                <td>{{ ent.standardStdDev }}</td>
+                <td>{{ ent.CorrelationOfStandards }}</td>
+                <td>{{ ent.peakTailing }}</td>
+                <td>{{ ent.resolution }}</td>
+            </tr>
         {% endfor %}
-    </ol>
-<a href="{% url 'myapp:my_analysis' %}">Register another entry</a></li>
+        </tbody>
+      </table>
+
+<!--<a href="{% url 'myapp:my_analysis' %}">Register another entry</a></li>-->
 {% endblock %}

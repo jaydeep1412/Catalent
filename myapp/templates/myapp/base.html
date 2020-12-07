@@ -3,8 +3,15 @@
 <html>
     <head>
 
-        <!--<link rel="stylesheet" type="text/css" href="{% static 'myapp/style.css'%}"/>-->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+          <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,23 +19,36 @@
         <title>Method Analytics - {% block title %}Welcome!{% endblock %}</title>
     </head>
     <body>
-        <div>
-            <h1>{% block myhdg %}Hello
-                {% if request.session.username %}
-                    {{ request.session.first_name }} {{ request.session.last_name }}
-                {% else %}
-                    User
-                {% endif %}
-            {% endblock %}</h1>
-        <hr/>
+
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{% url 'myapp:user_login' %}">Catalent</a>
+        </div>
+          {% if request.session.username %}
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="{% url 'myapp:list_entry' %}">My Account</a></li>
+              <li><a href="{% url 'myapp:display' %}">Visualize the Data</a></li>
+                <li><a href="{% url 'myapp:my_analysis' %}">New Entry</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href = "{% url 'myapp:user_logout' %}"><span class="glyphicon glyphicon-log-in"></span>Logout</a></li>
+            </ul>
+          {% else %}
+            <ul class="nav navbar-nav">
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="{% url 'myapp:register' %}"><span class="glyphicon glyphicon-user"></span>Sign Up</a></li>
+              <li><a href = "{% url 'myapp:user_login' %}"><span class="glyphicon glyphicon-log-in"></span>Login</a></li>
+            </ul>
+          {% endif %}
+      </div>
+</nav>
+
+        <div style="padding-left: 3%">
             {% block body_block %} {% endblock %}
         </div>
-        <hr/>
-        <div>
-
-         </div>
-        <hr/>
-        <div class='container'>
+        <div class='container' style="padding-left: 3%">
             {% block content %}
             {% endblock content %}
         </div>
@@ -38,22 +58,6 @@
                 {% block jquery %}{% endblock %}
             })
         </script>
-        <div>
-            {% if request.session.username %}
-
-                <ul class="list-group list-group-horizontal">
-                    <li class="list-group-item"><a href="{% url 'myapp:list_entry' %}">My Account</a></li>
-                    <li class="list-group-item"><a href="{% url 'myapp:display' %}">Visualize the Data</a></li>
-                    <li class="list-group-item"><a href = "{% url 'myapp:user_logout' %}">Logout</a></li>
-                </ul>
-            {% else %}
-
-                <ul class="list-group list-group-horizontal">
-                    <li class="list-group-item"><a href="{% url 'myapp:register' %}">Register Here</a></li>
-                    <li class="list-group-item"><a href = "{% url 'myapp:user_login' %}">Login</a></li>
-                </ul>
-            {% endif %}
-        </div>
 
  </body>
 </html>

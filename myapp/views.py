@@ -41,7 +41,7 @@ def user_login(request):
     # to expire after cetain seconds
     # request.session.set_expiry(3600)
     # to expire as the user closes the window
-    # request.session.set_expiry(0)
+    request.session.set_expiry(0)
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('myapp:list_entry'))
     else:
@@ -102,7 +102,8 @@ def list_entries(request):
     if request.user.is_authenticated:
         print(request.user.username)
         analyst = Analyst.objects.get(first_name__iexact=request.user.username)
-        analyst_details = Analysis.objects.filter(analyst__username__iexact=request.user.username)
+        #There is a limit of 20 values which can be loaded in the list entry html
+        analyst_details = Analysis.objects.filter(analyst__username__iexact=request.user.username)[:20]
         return render(request, 'myapp/list_entry.html', {'analyst_details': analyst_details, 'analyst': analyst})
     else:
         msg = 'Please login to see your entries'
